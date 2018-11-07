@@ -35,7 +35,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
             control_frequency: 10.0
             diagnostic_frequency: 1.0
-
+	    encoder_frequency: 40.0
+	    
             max_acceleration: 3.0
             max_speed: 1.0
             wheel_diameter: 0.3302
