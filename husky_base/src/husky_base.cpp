@@ -64,6 +64,7 @@ void controlLoop(husky_base::HuskyHardware &husky,
 void diagnosticLoop(husky_base::HuskyHardware &husky)
 {
   husky.updateDiagnostics();
+  husky.updateEncoders();
 }
 
 int main(int argc, char *argv[])

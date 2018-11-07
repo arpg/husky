@@ -64,6 +64,7 @@ namespace husky_base
     horizon_legacy::configureLimits(max_speed_, max_accel_);
     resetTravelOffset();
     initializeDiagnostics();
+    initializeEncoders();
     registerControlInterfaces();
   }
 
@@ -105,6 +106,11 @@ namespace husky_base
     diagnostic_publisher_ = nh_.advertise<husky_msgs::HuskyStatus>("status", 10);
   }
 
+  void HuskyHardware::initializeEncoders()
+  {
+    encoder_publisher_ = nh_.advertise<husky_msgs::HuskyEncoders>("encoders", 10);
+  }
+  
 
   /**
   * Register interfaces with the RobotHW interface manager, allowing ros_control operation
@@ -138,6 +144,25 @@ namespace husky_base
     diagnostic_publisher_.publish(husky_status_msg_);
   }
 
+  /* Update the encoders */
+  void HuskyHardware::updateEncoders()
+  {
+    
+    husky_msgs::HuskyEncoders encoder_msg_;
+    encoder_msg_.header.stamp = ros::Time::now();
+
+    //Pull the raw encoder data:
+    horizon_legacy::Channel<clearpath::DataEncodersRaw>::Ptr enc = horizon_legacy::Channel<clearpath::DataEncodersRaw>::requestData(
+      polling_timeout_);
+    if (enc)
+      {
+	for (uint8_t i=0; i<enc->getCount(); i++)
+	  {
+	    encoder_msg_.ticks.push_back(enc->getTicks(i));
+	  }
+      }
+    encoder_publisher_.publish(encoder_msg_);
+  }
   /**
   * Pull latest speed and travel measurements from MCU, and store in joint structure for ros_control
   */

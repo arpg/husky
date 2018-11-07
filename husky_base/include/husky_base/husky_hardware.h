@@ -40,6 +40,7 @@
 #include "ros/ros.h"
 #include "sensor_msgs/JointState.h"
 #include "husky_msgs/HuskyStatus.h"
+#include "husky_msgs/HuskyEncoders.h"
 #include <string>
 
 namespace husky_base
@@ -62,10 +63,14 @@ namespace husky_base
 
     void reportLoopDuration(const ros::Duration &duration);
 
+    void updateEncoders();
+    
   private:
 
     void initializeDiagnostics();
 
+    void initializeEncoders();
+    
     void resetTravelOffset();
 
     void registerControlInterfaces();
@@ -91,6 +96,9 @@ namespace husky_base
     HuskyHardwareDiagnosticTask<clearpath::DataSafetySystemStatus> safety_status_task_;
     HuskySoftwareDiagnosticTask software_status_task_;
 
+    //Wheel encoders
+    ros::Publisher encoder_publisher_;
+    
     // ROS Parameters
     double wheel_diameter_, max_accel_, max_speed_;
 
