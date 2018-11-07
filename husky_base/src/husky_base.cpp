@@ -64,6 +64,11 @@ void controlLoop(husky_base::HuskyHardware &husky,
 void diagnosticLoop(husky_base::HuskyHardware &husky)
 {
   husky.updateDiagnostics();
+}
+
+/* Publish encoder data */
+void encoderLoop(husky_base::HuskyHardware &husky)
+{
   husky.updateEncoders();
 }
 
@@ -72,9 +77,10 @@ int main(int argc, char *argv[])
   ros::init(argc, argv, "husky_base");
   ros::NodeHandle nh, private_nh("~");
 
-  double control_frequency, diagnostic_frequency;
+  double control_frequency, diagnostic_frequency, encoder_frequency;
   private_nh.param<double>("control_frequency", control_frequency, 10.0);
   private_nh.param<double>("diagnostic_frequency", diagnostic_frequency, 1.0);
+  private_nh.param<double>("encoder_frequency", encoder_frequency, 10.0);
 
   // Initialize robot hardware and link to controller manager
   husky_base::HuskyHardware husky(nh, private_nh, control_frequency);
@@ -99,6 +105,12 @@ int main(int argc, char *argv[])
     boost::bind(diagnosticLoop, boost::ref(husky)),
     &husky_queue);
   ros::Timer diagnostic_loop = nh.createTimer(diagnostic_timer);
+
+  ros::TimerOptions encoder_timer(
+    ros::Duration(1 / encoder_frequency),
+    boost::bind(encoderLoop, boost::ref(husky)),
+    &husky_queue);
+  ros::Timer encoder_loop = nh.createTimer(encoder_timer);
 
   husky_spinner.start();
 
